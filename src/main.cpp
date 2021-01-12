@@ -16,14 +16,27 @@
 // char pass[] = "************";
 #include "credentials.h"
 
+unsigned long startWiggleAt;
+unsigned long wigglePeriod = 300;
+
+const uint8_t kMotorAPin = 0;
+const uint8_t kMotorBPin = 2;
+
+BLYNK_WRITE(V0)
+{
+    wigglePeriod = param.asLong();
+}
+
 BLYNK_WRITE(V1)
 {
-  int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
-  // You can also use:
-  // String i = param.asStr();
-  // double d = param.asDouble();
-  Serial.print("V1 Slider value is: ");
-  Serial.println(pinValue);
+  int pinValue = param.asInt();
+  if (pinValue == 1) {
+      startWiggleAt = millis();
+  } else {
+      startWiggleAt = 0;
+      digitalWrite(kMotorAPin, LOW);
+      digitalWrite(kMotorBPin, LOW);
+  }
 }
 
 void setup()
@@ -31,11 +44,22 @@ void setup()
   // Debug console
   Serial.begin(9600);
 
+  pinMode(kMotorAPin, OUTPUT);
+  digitalWrite(kMotorAPin, LOW);
+  pinMode(kMotorBPin, OUTPUT);
+  digitalWrite(kMotorBPin, LOW);
+
   Blynk.begin(auth, ssid, pass);
 }
 
 void loop()
 {
   Blynk.run();
+
+  if (startWiggleAt != 0) {
+      int turn = (millis() / wigglePeriod) % 2;
+      digitalWrite(kMotorAPin, turn == 0 ? HIGH : LOW);
+      digitalWrite(kMotorBPin, turn == 1 ? HIGH : LOW);
+  }
 }
 
