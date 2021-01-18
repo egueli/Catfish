@@ -22,6 +22,8 @@ unsigned long wigglePeriod = 300;
 const uint8_t kMotorAPin = 0;
 const uint8_t kMotorBPin = 2;
 
+WidgetLCD lcd(V3);
+
 BLYNK_WRITE(V0)
 {
     wigglePeriod = param.asLong();
@@ -50,6 +52,7 @@ void setup()
   digitalWrite(kMotorBPin, LOW);
 
   Blynk.begin(auth, ssid, pass);
+  lcd.print(0, 0, "IP:" + WiFi.localIP().toString());
 }
 
 void loop()
