@@ -18,7 +18,7 @@
 #include "credentials.h"
 
 unsigned long startWiggleAt;
-unsigned long wigglePeriod = 300;
+unsigned long wigglePeriod = 90;
 
 const uint8_t kMotorAPin = 0;
 const uint8_t kMotorBPin = 2;
