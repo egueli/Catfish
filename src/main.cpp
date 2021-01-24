@@ -22,6 +22,7 @@ unsigned long wigglePeriod = 90;
 
 const uint8_t kMotorAPin = 0;
 const uint8_t kMotorBPin = 2;
+const uint8_t kVibrationSwitchPin = 3;
 
 WidgetLCD lcd(V3);
 
@@ -46,13 +47,14 @@ void otaSetup();
 
 void setup()
 {
-  // Debug console
-  Serial.begin(9600);
+  // No serial RX, sorry. We need that pin for vibration sensor.
+  Serial.begin(9600, SERIAL_8N1, SERIAL_TX_ONLY);
 
   pinMode(kMotorAPin, OUTPUT);
   digitalWrite(kMotorAPin, LOW);
   pinMode(kMotorBPin, OUTPUT);
   digitalWrite(kMotorBPin, LOW);
+  pinMode(kVibrationSwitchPin, INPUT_PULLUP);
 
   Blynk.begin(auth, ssid, pass);
   lcd.print(0, 0, "IP:" + WiFi.localIP().toString());
@@ -68,6 +70,10 @@ void loop()
       int turn = (millis() / wigglePeriod) % 2;
       digitalWrite(kMotorAPin, turn == 0 ? HIGH : LOW);
       digitalWrite(kMotorBPin, turn == 1 ? HIGH : LOW);
+  }
+
+  if (digitalRead(kVibrationSwitchPin) == LOW) {
+    Blynk.virtualWrite(V4, millis());
   }
 
   ArduinoOTA.handle();
